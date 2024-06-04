@@ -1,5 +1,8 @@
 This repository is the official implementation of the paper "Cyclic image generation using chaotic dynamics" by Takaya Tanaka and Yutaka Yamaguti.
 
+[![arXiv](https://img.shields.io/badge/arXiv-2405.20717-b31b1b.svg)](https://arxiv.org/abs/2405.20717)
+
+
 This repository contains codes to define and train CycleChaosGAN models for generating 
 sequence of images, to analyze the generated sequences from the viewpoint of chaos theory, and to visualize the results.
 
@@ -32,8 +35,20 @@ sequence of images, to analyze the generated sequences from the viewpoint of cha
 5. Run the shell './run_all.sh' to train the model and generate the figures 
 
 
+## Citation
 
+If you find this code useful in your research, please consider citing the following paper:
 
+```
+@misc{tanaka2024cyclic,
+      title={Cyclic image generation using chaotic dynamics}, 
+      author={Takaya Tanaka and Yutaka Yamaguti},
+      year={2024},
+      eprint={2405.20717},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```
 
 
 
