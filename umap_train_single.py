@@ -123,6 +123,42 @@ amb21 = train_images_z[u_train[last1:last2,0]>10]# type:ignore
 #%%
 plt.imshow(amb21[9,:,:,0], cmap='gray')
 
+#%%
+# 訓練データの2次元表現 u_train に対しk-means clustering をk=3でおこなう
+
+from sklearn.cluster import KMeans
+from sklearn.metrics import adjusted_rand_score, rand_score
+kmeans = KMeans(n_clusters=3, random_state=0).fit(u_train)
+# 訓練データを分類した結果を得る
+
+labels_umap = kmeans.labels_
+
+# 正解のラベルを作る
+labels = np.zeros(len(train_images_x) + len(train_images_y) + len(train_images_z))
+labels[len(train_images_x):len(train_images_x)+len(train_images_y)] = 1
+labels[len(train_images_x)+len(train_images_y):] = 2
+
+# 正解ラベルと分類結果の一致度を計算
+ars = adjusted_rand_score(labels, labels_umap)
+print(f'Adjusted Rand Score : {ars}')
+
+rand_s = rand_score(labels, labels_umap)
+print(f'Rand Score : {rand_s}')
+
+# ARIとRI をテキスト形式で保存
+with open(os.path.join(data_dir, 'ARI_RI.txt'), 'w') as f:
+    f.write(f'Adjusted Rand Score : {ars}\n')
+    f.write(f'Rand Score : {rand_s}\n')
+
+plt.hist(labels_umap, bins=3)
+
+fig = plt.figure()
+fname  = 'umap_' + name_dataset + '_train'
+plt.scatter(u_train[labels_umap==0, 0], u_train[labels_umap==0, 1], s=0.15, c = "lightgreen") # 主成分をプロット 0 #type:ignore
+plt.scatter(u_train[labels_umap==1, 0], u_train[labels_umap==1, 1], s=0.15, c = "pink") # 主成分をプロット 1 # type:ignore
+plt.scatter(u_train[labels_umap==2, 0], u_train[labels_umap==2, 1], s=0.15, c = "cyan") 
+
+
 
 #%% loading models
 
@@ -289,6 +325,30 @@ fname = 'umap_' + name_dataset + '_train_64ics'
 fig.savefig(os.path.join(fig_dir, fname+'.png'), bbox_inches='tight',pad_inches = 0.1, dpi=360)
 fig.savefig(os.path.join(fig_dir, fname+'.tiff'), bbox_inches='tight',pad_inches = 0.1, dpi=360)
 fig.savefig(os.path.join(fig_dir, fname+'.pdf'), bbox_inches='tight',pad_inches = 0.1)
+
+
+
+
+#%%　trustworthiness and continuity を使ってuxのembeddingを評価する
+
+from sklearn.manifold import trustworthiness
+
+n_trj = 10
+x_orig = im_seq[0:n_trj].reshape((-1,28*28))
+x_emb = ux[0:n_trj,:,:].reshape((-1,2))
+trw = trustworthiness(x_orig, x_emb, n_neighbors=5)
+print(f'trustworthiness: {trw}')
+
+continuity = trustworthiness(x_emb, x_orig, n_neighbors=5)
+
+print(f'continuity: {continuity}')
+
+# 結果をテキストファイルで保存
+
+with open(os.path.join(data_dir, 'trustworthiness_continuity.txt'), 'w') as f:
+    f.write(f'Trustworthiness : {trw}\n')
+    f.write(f'continuity : {continuity}\n')
+
 
 # %%
 # same for PCA
